@@ -1,10 +1,11 @@
 from django.shortcuts import render, redirect
+from django.urls import reverse_lazy
 from .forms import RegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import TaskModelForm
 from .models import TaskModel
-from django.views.generic.edit import FormView
+from django.views.generic.edit import FormView, UpdateView
 from django.views.generic import DetailView, DeleteView, ListView
 
 class Home(ListView):
@@ -25,11 +26,25 @@ class AddTask(FormView):
         form.save()
         return redirect('home')
 
+# update task
+class UpdateTask(UpdateView):
+    model = TaskModel
+    form_class = TaskModelForm
+    template_name = 'task/update_task.html' 
+    success_url = reverse_lazy('home')
+
+# delete task
+class DeleteTask(DeleteView):
+    model = TaskModel
+    template_name = 'task/delete_task.html'
+
+    success_url = reverse_lazy('home') 
 
 # task detail page view
-def task_detail(request, id):
-    return render(request, 'task/task_detail.html') 
-
+class TaskDetail(DetailView):
+    model = TaskModel
+    template_name = 'task/task_detail.html'
+    context_object_name = 'tasks'
 
 # user register
 def user_register(request):

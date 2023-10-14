@@ -45,7 +45,7 @@
                     {% for task in tasks %}
                         <tr>
                             <td class="px-6 py-4 whitespace-nowrap">
-                                <a class="cursor-pointer bg-red-500" href="{% url 'task_detail' 1 %}">
+                                <a class="cursor-pointer bg-red-500" href="{% url 'task_detail' pk=task.id %}">
                                     <div class="text-sm text-gray-900 text-center">{{task.title}}</div>
                                 </a>
                             </td>
