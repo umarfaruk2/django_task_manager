@@ -4,9 +4,51 @@ from .forms import RegisterForm
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.forms import AuthenticationForm
 from .forms import TaskModelForm
-from .models import TaskModel
+from .models import TaskModel, TaskImageModel
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic import DetailView, DeleteView, ListView
+from django.forms import modelformset_factory
+
+# class Home(ListView):
+#     model = TaskModel
+#     template_name = 'task/home.html'
+#     context_object_name = 'tasks'
+    
+#     def get_queryset(self):
+#         search_value = self.request.GET.get('search')
+#         search_by_due = self.request.GET.get('search_by_due')
+#         search_by_creation = self.request.GET.get('search_by_creation')
+#         search_by_priority = self.request.GET.get('priority') 
+#         search_by_status = self.request.GET.get('status') 
+
+#         if search_value:
+#             queryset = TaskModel.objects.filter(user = self.request.user, title__icontains = search_value)
+#         else:
+#             queryset = TaskModel.objects.filter(user = self.request.user)
+        
+#         if search_by_creation:
+#             queryset = TaskModel.objects.filter(user = self.request.user, created_at__date = search_by_creation)
+
+#         if search_by_due:
+#             queryset = TaskModel.objects.filter(user = self.request.user, due_date = search_by_due)
+        
+#         if search_by_priority:
+#             queryset = TaskModel.objects.filter(user = self.request.user, priority = search_by_priority)
+        
+#         if search_by_status:
+#             if search_by_status == 'complete':
+#                 queryset = TaskModel.objects.filter(user = self.request.user, is_complete = True)
+#             else:
+#                 queryset = TaskModel.objects.filter(user = self.request.user, is_complete = False)
+        
+#         queryset = queryset.order_by('priority')  
+
+#         return queryset
+    
+#     def get_context_data(self, **kwargs):
+#         context = super().get_context_data(**kwargs)
+#         context['task_images'] = TaskImageModel.objects.all()
+#         return context
 
 class Home(ListView):
     model = TaskModel
@@ -14,17 +56,103 @@ class Home(ListView):
     context_object_name = 'tasks'
     
     def get_queryset(self):
-        return TaskModel.objects.filter(user = self.request.user)
+        search_value = self.request.GET.get('search')
+        search_by_due = self.request.GET.get('search_by_due')
+        search_by_creation = self.request.GET.get('search_by_creation')
+        search_by_priority = self.request.GET.get('priority') 
+        search_by_status = self.request.GET.get('status') 
+
+        if search_value:
+            queryset = TaskModel.objects.filter(user = self.request.user, title__icontains = search_value)
+        else:
+            queryset = TaskModel.objects.filter(user = self.request.user)
+        
+        if search_by_creation:
+            queryset = TaskModel.objects.filter(user = self.request.user, created_at__date = search_by_creation)
+
+        if search_by_due:
+            queryset = TaskModel.objects.filter(user = self.request.user, due_date = search_by_due)
+        
+        if search_by_priority:
+            queryset = TaskModel.objects.filter(user = self.request.user, priority = search_by_priority)
+        
+        if search_by_status:
+            if search_by_status == 'complete':
+                queryset = TaskModel.objects.filter(user = self.request.user, is_complete = True)
+            else:
+                queryset = TaskModel.objects.filter(user = self.request.user, is_complete = False)
+        
+        # queryset = queryset.order_by('priority')  
+        
+        def custom_priority_sort(task):
+            priority_order = {
+                'High': 0,
+                'Medium': 1,
+                'Low': 2,
+            }
+            return priority_order.get(task.priority, 3)
+
+        queryset = sorted(queryset, key=custom_priority_sort)
+
+        for task in queryset:
+            task.image = TaskImageModel.objects.filter(task=task).first()
+            
+        return queryset
+
+
+    # def get_context_data(self, **kwargs):
+    #     context = super().get_context_data(**kwargs)
+    #     tasks_with_images = []
+    #     for task in context['tasks']:
+    #         task_images = TaskImageModel.objects.filter(task=task)
+    #         print(task_images)
+    #         tasks_with_images.append({
+    #             'task': task,
+    #             'images': task_images,
+    #         })
+    #     context['tasks_with_images'] = tasks_with_images
+    #     return context 
 
 # add task
+# class AddTask(FormView):
+#     template_name = 'task/add_task.html'
+#     form_class = TaskModelForm
+    
+
+#     def form_valid(self, form):
+#         task = form.save(commit=False)
+#         task.user = self.request.user
+
+#         # Save the images
+#         if 'image' in self.request.FILES:
+#             images = self.request.FILES.getlist('image')
+#             print(images)
+#             for image in images:
+#                 task.image = image 
+#                 task.save()
+#         else:
+#             print('not have any image')
+# #         # Save the task
+# #         task.save()
+            
+#         return redirect('home')
+
 class AddTask(FormView):
     template_name = 'task/add_task.html'
-    form_class = TaskModelForm
-    
+    form_class = TaskModelForm  
+
     def form_valid(self, form):
-        form.instance.user = self.request.user
-        form.save()
+        task = form.save(commit=False)
+        task.user = self.request.user
+        task.save()
+
+        # Save the images
+        for image in form.cleaned_data['image']:
+            task_image = TaskImageModel(task=task, image=image)  
+            task_image.save()
+
         return redirect('home')
+
 
 # update task
 class UpdateTask(UpdateView):
@@ -45,6 +173,17 @@ class TaskDetail(DetailView):
     model = TaskModel
     template_name = 'task/task_detail.html'
     context_object_name = 'tasks'
+
+# is_compete
+def is_complete(request, id):
+    task = TaskModel.objects.get(pk = id) 
+    if task.is_complete:
+        task.is_complete = False
+    else:
+        task.is_complete = True
+    task.save()
+
+    return redirect('task_detail', pk = id)
 
 # user register
 def user_register(request):

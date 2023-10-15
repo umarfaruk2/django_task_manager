@@ -2,6 +2,7 @@ from django import forms
 from django.contrib.auth.models import User
 from django.contrib.auth.forms import UserCreationForm
 from .models import TaskModel
+from multiupload.fields import MultiFileField
 
 class RegisterForm(UserCreationForm):
     username = forms.CharField(label='Username', help_text='')
@@ -13,6 +14,16 @@ class RegisterForm(UserCreationForm):
 
 
 class TaskModelForm(forms.ModelForm):
+    due_date = forms.DateField(
+        widget=forms.DateInput(attrs={'type': 'date', 'placeholder': 'Select a due date'}),
+    )
+
+    image = MultiFileField(min_num=1, max_num=20, max_file_size=1024*1024*5) 
+    # image = forms.FileField(widget = forms.TextInput(attrs={
+    #         "name": "images",
+    #         "type": "File",
+    #         "multiple": "True",
+    #     }))
     class Meta:
         model = TaskModel
         fields = ['title', 'description', 'due_date', 'priority', 'image']

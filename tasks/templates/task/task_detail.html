@@ -30,7 +30,15 @@
             
             <div class="flex items-center space-x-4">
                 <span class="text-sm font-semibold text-gray-600">Status:</span>
-                <input type="checkbox" id="markComplete" class="form-checkbox h-4 w-4 text-green-500" />
+                {% if tasks.is_complete %}
+                    <a href="{% url 'is_complete' tasks.id %}">
+                        <input type="checkbox" id="markComplete is_complete" class="form-checkbox h-4 w-4 text-green-500" checked="true" />
+                    </a>
+                {% else %}
+                    <a href="{% url 'is_complete' tasks.id %}">
+                        <input type="checkbox" id="markComplete is_complete" class="form-checkbox h-4 w-4 text-green-500" />
+                    </a>
+                {% endif %}
                 <label for="markComplete" class="ml-2">Mark as Complete</label>
             </div>
 
@@ -40,4 +48,10 @@
             </div>
         </div>
     </div>
+
+    <!-- <script>
+        const check_box = document.getElementById('is_complete')
+
+        check_box.checked = true
+    </script> -->
 {% endblock content %}

@@ -1,92 +1,196 @@
-{% extends "base.html" %}
-{% load static %}
-
-{% block title %}
-    Home
-{% endblock title %}
-
+{% extends "base.html" %} {% load static %} 
+{% block title %} 
+    Home 
+{% endblock title %} 
 
 {% block content %}
-<h3 class="ml-12 text-2xl font-bold">All Tasks</h3>
 
-<div class=" mx-auto py-6 sm:px-6 lg:px-8">
-    <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
-        <div class="p-6 bg-white border-b border-gray-200">
-            <table class="min-w-full divide-y divide-gray-200">
-                <thead>
-                    <tr>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Title
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Description
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Due Date
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Priority
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Is Complete
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Created At
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Last Updated
-                        </th>
-                        <th scope="col" class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                            Photos
-                        </th>
-                    </tr>
-                </thead>
-                <tbody class="bg-white divide-y divide-gray-200">
-                    {% for task in tasks %}
-                        <tr>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <a class="cursor-pointer bg-red-500" href="{% url 'task_detail' pk=task.id %}">
-                                    <div class="text-sm text-gray-900 text-center">{{task.title}}</div>
-                                </a>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 text-center">{{task.description}}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 text-center">{{task.due_date}}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 text-center">
-                                    {{task.get_priority_display}}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap text-center">
-                                <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
-                                    {{task.is_complete}}
-                                </span>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 text-center">{{task.created_at}}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <div class="text-sm text-gray-900 text-center">{{task.last_updated}}</div>
-                            </td>
-                            <td class="px-6 py-4 whitespace-nowrap">
-                                <ul class="photo-list">
-                                        <li class="photo">
-                                            <img src={{task.image.url}} alt="{{ photo.task.title }} Photo" class="h-10">
-                                        </li>
-                                </ul>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-    </div>
+<h3 class="ml-5 text-2xl font-bold text-center">All Tasks</h3>
+<div class="ml-12 mt-3 flex items-center space-x-4">
+  <a
+    href="{% url 'home' %}"
+    class="bg-cyan-500 p-2 rounded-md text-white text-sm"
+    >Search All</a
+  >
+
+  <!-- search by title -->
+  <div>
+    <form action="" method="get">
+      <input type="text" name="search" class="bg-gray-200 pl-3 py-1 w-36" />
+      <input
+        class="bg-gray-500 px-2 py-1 rounded-md text-white text-sm"
+        type="submit"
+        value="search"
+      />
+    </form>
+  </div>
+
+  <!-- creation date filter -->
+  <form method="get">
+    <input type="date" name="search_by_creation" class="border-black border" />
+    <input
+      class="bg-gray-500 px-2 py-1 rounded-md text-white text-sm"
+      type="submit"
+      value="search by creation"
+    />
+  </form>
+
+  <!-- due date filter -->
+  <form method="get">
+    <input type="date" name="search_by_due" class="border-black border" />
+    <input
+      class="bg-gray-500 px-2 py-1 rounded-md text-white text-sm"
+      type="submit"
+      value="search by due"
+    />
+  </form>
+
+  <!-- search by priority -->
+  <form action="" method="get">
+    <select id="priority" name="priority" class="p-1">
+      <option value="High">High</option>
+      <option value="Medium">Medium</option>
+      <option value="Low">Low</option>
+    </select>
+    <button
+      type="submit"
+      class="bg-gray-500 px-2 py-1 rounded-md text-white text-sm"
+    >
+      Apply Priority 
+    </button>
+  </form>
+
+  <!-- search by complete or not -->
+  <form action="" method="get">
+    <select id="status" name="status" class="p-1">
+      <option value="complete">Complete</option>
+      <option value="not_complete">Not Complete</option>
+    </select>
+    <button
+      type="submit"
+      class="bg-gray-500 px-2 py-1 rounded-md text-white text-sm"
+    >
+      Apply by status 
+    </button>
+  </form>
 </div>
 
+<div class="mx-auto py-6 sm:px-6 lg:px-8">
+  <div class="bg-white overflow-hidden shadow-sm sm:rounded-lg">
+    <div class="p-6 bg-white border-b border-gray-200">
+      <table class="min-w-full divide-y divide-gray-200">
+        <thead>
+          <tr>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Title
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Description
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Due Date
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Priority
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Is Complete
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Created At
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Last Updated
+            </th>
+            <th
+              scope="col"
+              class="px-6 py-3 bg-gray-50 text-center text-xs font-medium text-gray-500 uppercase tracking-wider"
+            >
+              Photos
+            </th>
+          </tr>
+        </thead>
+        <tbody class="bg-white divide-y divide-gray-200">
+          {% for task in tasks %}
+          <tr>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <a
+                class="cursor-pointer bg-red-500"
+                href="{% url 'task_detail' pk=task.id %}"
+              >
+                <div class="text-sm text-gray-900 text-center">
+                  {{task.title}}
+                </div>
+              </a>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 text-center">
+                {{task.description}}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 text-center">
+                {{task.due_date}}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-green-100 text-green-800 text-center"
+              >
+                {{task.get_priority_display}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap text-center">
+              <span
+                class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800"
+              >
+                {{task.is_complete}}
+              </span>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 text-center">
+                {{task.created_at}}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <div class="text-sm text-gray-900 text-center">
+                {{task.last_updated}}
+              </div>
+            </td>
+            <td class="px-6 py-4 whitespace-nowrap">
+              <ul class="photo-list">
+                <li class="photo">
 
-
+                </li>
+              </ul>
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
 
 {% endblock content %}
