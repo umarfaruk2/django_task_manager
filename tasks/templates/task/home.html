@@ -181,7 +181,11 @@
             <td class="px-6 py-4 whitespace-nowrap">
               <ul class="photo-list">
                 <li class="photo">
-
+                  {% if task.image %}
+                    <img src="{{task.image.url}}" alt="photo" class="w-36">
+                  {% else %}
+                    <h3>no photo</h3>
+                  {% endif %}
                 </li>
               </ul>
             </td>

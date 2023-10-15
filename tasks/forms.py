@@ -19,11 +19,6 @@ class TaskModelForm(forms.ModelForm):
     )
 
     image = MultiFileField(min_num=1, max_num=20, max_file_size=1024*1024*5) 
-    # image = forms.FileField(widget = forms.TextInput(attrs={
-    #         "name": "images",
-    #         "type": "File",
-    #         "multiple": "True",
-    #     }))
     class Meta:
         model = TaskModel
         fields = ['title', 'description', 'due_date', 'priority', 'image']

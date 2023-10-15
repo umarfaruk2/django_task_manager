@@ -14,4 +14,4 @@ admin.site.register(TaskModel, TaskModelAdmin)
 
 @admin.register(TaskImageModel)
 class TaskImageModelAdmin(admin.ModelAdmin):
-    list_display = ('task', 'image')
+    list_display = ('id', 'task', 'image')
