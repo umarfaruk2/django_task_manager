@@ -8,6 +8,8 @@ from .models import TaskModel, TaskImageModel
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic import DetailView, DeleteView, ListView
 from django.forms import modelformset_factory
+from rest_framework import viewsets
+from .serializers import TaskModelSerializer
 
 class Home(ListView):
     model = TaskModel
@@ -101,7 +103,7 @@ class TaskDetail(DetailView):
     
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context['images'] = TaskImageModel.objects.filter(task = self.object).first()
+        context['images'] = TaskImageModel.objects.filter(task = self.object)
         return context
 
 # is_compete
@@ -154,3 +156,6 @@ def user_logout(request):
 
 
 # rest apis
+class TaskView(viewsets.ModelViewSet):
+    queryset = TaskModel.objects.all()   
+    serializer_class = TaskModelSerializer 
