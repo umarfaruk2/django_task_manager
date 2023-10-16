@@ -58,10 +58,10 @@ class Home(ListView):
                 task.image = task_image.image  
             else:
                 task.image = None 
-            print(task)
             
         return queryset
 
+# add task
 class AddTask(FormView):
     template_name = 'task/add_task.html'
     form_class = TaskModelForm  
@@ -98,6 +98,11 @@ class TaskDetail(DetailView):
     model = TaskModel
     template_name = 'task/task_detail.html'
     context_object_name = 'tasks'
+    
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['images'] = TaskImageModel.objects.filter(task = self.object).first()
+        return context
 
 # is_compete
 def is_complete(request, id):
@@ -145,3 +150,7 @@ def user_logout(request):
     logout(request)
 
     return redirect('login')
+
+
+
+# rest apis

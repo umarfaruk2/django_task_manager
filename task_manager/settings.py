@@ -31,6 +31,7 @@ INSTALLED_APPS = [
 
     'tasks',
     'core',
+    'rest_framework',
 ]
 
 CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
