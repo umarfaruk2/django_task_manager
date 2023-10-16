@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}
+    Delete current image
+{% endblock title %}
+
+{% block content %}
+    <div class="w-[85%] mx-auto mt-5">
+        <h3 class="text-center font-bold text-2xl">Delete current image</h3>
+
+       <div class="flex flex-wrap space-x-4 space-y-4">
+    {% for task in tasks %}
+        <div class="w-1/4">
+            <img src="{{ task.image.url }}" alt="image" class="mb-2 w-36 h-28">
+            <a href="{% url 'delete_image' task.id task_id.id %}" class="bg-red-500 p-1 rounded-md text-white text-sm mt-2">Delete Image</a>
+        </div>
+    {% endfor %}
+</div>
+
+    </div>
+{% endblock content %}

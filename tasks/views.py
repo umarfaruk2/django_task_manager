@@ -1,4 +1,5 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.urls import reverse_lazy
 from .forms import RegisterForm
 from django.contrib.auth import authenticate, login, logout
@@ -7,7 +8,6 @@ from .forms import TaskModelForm
 from .models import TaskModel, TaskImageModel
 from django.views.generic.edit import FormView, UpdateView
 from django.views.generic import DetailView, DeleteView, ListView
-from django.forms import modelformset_factory
 from rest_framework import viewsets
 from .serializers import TaskModelSerializer
 
@@ -87,6 +87,33 @@ class UpdateTask(UpdateView):
     form_class = TaskModelForm
     template_name = 'task/update_task.html' 
     success_url = reverse_lazy('home')
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['task_id'] = self.object.id  
+        return context
+    
+    def form_valid(self, form):
+        task = form.save(commit=False)
+
+        # Save the images
+        for image in form.cleaned_data['image']:
+            task_image = TaskImageModel(task=task, image=image)
+            task_image.save()
+
+        return redirect('home')
+
+# delete current image
+def delete_current_image(request, id):
+    task = TaskModel.objects.get(pk = id)
+    ImageTask = TaskImageModel.objects.filter(task = task)
+
+    return render(request, 'task/delete_current_image.html', {'tasks': ImageTask, 'task_id': task})
+
+def delete_image(request, id, task_id):
+    task = TaskImageModel.objects.get(pk = id).delete()
+
+    return redirect('delete_current_image', id = task_id) 
 
 # delete task
 class DeleteTask(DeleteView):

@@ -18,7 +18,8 @@ class TaskModelForm(forms.ModelForm):
         widget=forms.DateInput(attrs={'type': 'date', 'placeholder': 'Select a due date'}),
     )
 
-    image = MultiFileField(min_num=1, max_num=20, max_file_size=1024*1024*5) 
+    image = MultiFileField(min_num=1, max_num=20, max_file_size=1024*1024*5, required = False) 
     class Meta:
         model = TaskModel
         fields = ['title', 'description', 'due_date', 'priority', 'image']
+
